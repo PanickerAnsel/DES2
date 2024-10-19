@@ -35,5 +35,22 @@ string encryption(string plaintext, vector<string> keys) {
 }
 
 string decryption(string encrypted, vector<string> keys) {
-    return " ";
+    string permutedInput = permute(encrypted, IP, 64);
+    string leftBlock = permutedInput.substr(0,32);
+    string rightBlock = permutedInput.substr(32,32);
+
+    for (int i = keys.size()-1; i >=0; i--){
+        string newLeft = rightBlock;
+        string expanded = expansion(rightBlock); 
+        string xOred = XOR(expanded, keys[i], 48);
+        string sBoxed = sBox(xOred);
+        string pBoxed = pBox(sBoxed);
+        string newRight = XOR(pBoxed, leftBlock, 32);
+        rightBlock = newRight;
+        leftBlock = newLeft;
+    }
+    
+    string finalEncryption = rightBlock + leftBlock;
+    string finalPermutation = permute(finalEncryption, FP, 64);
+    return finalPermutation;
 }
